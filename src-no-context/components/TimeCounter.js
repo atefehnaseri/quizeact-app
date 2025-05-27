@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { useQuizContext } from "../contexts/QuizContext";
 
 // Utility: Format milliseconds into hh:mm:ss or mm:ss
 const formatTime = (ms, showHours = false) => {
@@ -16,8 +15,13 @@ const formatTime = (ms, showHours = false) => {
 };
 
 // Component: Timer or Stopwatch
-function TimeCounter({ mode = "timer", hours = 0, minutes = 0, seconds = 0 }) {
-  const { dispatch } = useQuizContext();
+function TimeCounter({
+  mode = "timer",
+  hours = 0,
+  minutes = 0,
+  seconds = 0,
+  dispatch,
+}) {
   //using useRef avoids recalculating or recreating values on each render.
   const totalMs = useRef((hours * 3600 + minutes * 60 + seconds) * 1000);
   const startTime = useRef(null);

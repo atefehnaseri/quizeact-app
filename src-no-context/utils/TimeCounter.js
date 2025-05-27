@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-import { useQuizContext } from "../contexts/QuizContext";
+import { useEffect, useState, useRef } from "react";
 
 // Utility: Format milliseconds into hh:mm:ss or mm:ss
 const formatTime = (ms, showHours = false) => {
@@ -17,12 +16,11 @@ const formatTime = (ms, showHours = false) => {
 
 // Component: Timer or Stopwatch
 function TimeCounter({ mode = "timer", hours = 0, minutes = 0, seconds = 0 }) {
-  const { dispatch } = useQuizContext();
   //using useRef avoids recalculating or recreating values on each render.
   const totalMs = useRef((hours * 3600 + minutes * 60 + seconds) * 1000);
   const startTime = useRef(null);
 
-  // const [time, setTime] = useState(mode === "timer" ? totalMs.current : 0);
+  const [time, setTime] = useState(mode === "timer" ? totalMs.current : 0);
 
   useEffect(() => {
     startTime.current = Date.now();
@@ -34,32 +32,28 @@ function TimeCounter({ mode = "timer", hours = 0, minutes = 0, seconds = 0 }) {
       if (mode === "timer") {
         const remaining = totalMs.current - elapsed;
         if (remaining <= 0) {
-          // setTime(0);
-          dispatch({ type: "setTimer", payload: 0 });
+          setTime(0);
           clearInterval(interval);
         } else {
-          // setTime(remaining);
-          dispatch({ type: "setTimer", payload: remaining });
+          setTime(remaining);
         }
       } else {
         //In stopwatch mode, elapsed is a measure of time since start, but we care about how much progress toward the total we've made.
         const progress = elapsed;
         if (progress >= totalMs.current) {
-          // setTime(totalMs.current);
-          dispatch({ type: "setTimer", payload: totalMs.current });
+          setTime(totalMs.current);
           clearInterval(interval);
         } else {
-          // setTime(progress);
-          dispatch({ type: "setTimer", payload: progress });
+          setTime(progress);
         }
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [mode, dispatch]);
+  }, [mode]);
 
   const showHours = hours > 0;
-  return <div className="timer">{formatTime(seconds, showHours)}</div>;
+  return <div className="timer">{formatTime(time, showHours)}</div>;
 }
 
 export default TimeCounter;
